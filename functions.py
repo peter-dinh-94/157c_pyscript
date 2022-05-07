@@ -27,12 +27,15 @@ def main():
     businessCollection = db["business"]
     userCollection = db["user"]
     
-    flag = True
+    get_pc = True
     while (True):
         print_menu(menu_option)
-        if flag:
-            postal_code = input('Please enter your postal code: ')
-            flag = False
+        if get_pc:
+            postal_code = input('**NOTE**: Due to the limit of Yelp dataset\n \
+            Please use some of these postal code for best experience\n \
+            Postal code: 19103, 89511, 19064, 19372\n \
+            Please enter your postal code: ')
+            get_pc = False
         option = int(input('Please enter your choice: '))
         
         if option == 16:
@@ -69,7 +72,7 @@ def main():
         elif option == 15:
             fetch_influenced_user(userCollection)
         elif option == 0:
-            flag = True
+            get_pc = True
 
 
 def find_business_by_name(collection, postal_code):
@@ -84,8 +87,10 @@ def find_business_by_name(collection, postal_code):
 
 # function 2
 def find_nearby_businesses_by_loc(collection, postal_code):
-    shard_query = { "postal_code": postal_code }
-    info = input("Please enter your <longitude>,<latitude>,<distance>: ")
+    shard_query = { "postal_code": "70130" }
+    info = input("For testing, please enter -90.065639019,29.950570141,5 \n \
+    Default postal code is 70130 \n \
+    Please enter your <longitude>,<latitude>,<distance(in mile)>: ")
     info = info.split(',')
     radius = float(info[2]) / 3963.2
     location_query = { "location": { "$geoWithin": { "$centerSphere": [[float(info[0]), float(info[1])], radius] } } }
@@ -102,10 +107,8 @@ def find_businesses_by_category(collection, postal_code):
     category = input("Please enter a category!\nFor example: Fast Food, Sushi, Italian, etc: ")
     category = category.split(',')
     regexQueries = [shard_query]
-    
     for el in category:
-        regexQueries.append( { "categories": { "$regex": el } } )
-        
+        regexQueries.append( { "categories": { "$regex": el } } ) 
     output = collection.find( { "$and": regexQueries } ,
            {"name": 1, "address": 1, "city": 1, "state": 1, "postal_code": 1,
                               "stars": 1, "categories": 1, "_id":0 }).limit(5)
@@ -172,7 +175,7 @@ def fetch_goodforkids_restaurants(collection, postal_code):
 def fetch_outdoor_seating_restaurants(collection, postal_code):
     shard_query = { "postal_code": postal_code }
     query={"attributes.OutdoorSeating" : "True"}
-    projection={"name" : 1, "_id" : 0, "city" : 1, "postal_code" : 1, "attributes.GoodForKids": 1}
+    projection={"name" : 1, "_id" : 0, "city" : 1, "postal_code" : 1, "attributes.OutdoorSeating": 1}
     cursor = collection.find(query, projection).sort("review_count", -1).limit(5)
     for record in cursor:
         printDoc(record)
@@ -181,7 +184,7 @@ def fetch_outdoor_seating_restaurants(collection, postal_code):
 def fetch_good_for_groups(collection, postal_code):
     shard_query = { "postal_code": postal_code }
     query={ "attributes.RestaurantsGoodForGroups" : "True"}
-    projection={"name" : 1, "_id" : 0, "city" : 1, "postal_code" : 1, "attributes.GoodForKids": 1}
+    projection={"name" : 1, "_id" : 0, "city" : 1, "postal_code" : 1, "attributes.RestaurantsGoodForGroups": 1}
     cursor = collection.find(query, projection).sort("review_count", -1).limit(5)
     for record in cursor:
         printDoc(record)
@@ -201,7 +204,7 @@ def fetch_user_by_name(collection):
     output = collection.find({"name": {"$regex": name}},
                              {"_id": 0, "friends": 0}).limit(5)
     for doc in output:
-        print(doc)
+        printDoc(doc)
 
 # function 14  Find elite user
 def fetch_elite_user(collection):
@@ -209,17 +212,13 @@ def fetch_elite_user(collection):
     output = collection.find({"elite": year},
                              {"_id": 0, "friends": 0}).limit(5)
     for doc in output:
-        print(doc)
+        printDoc(doc)
 
 # function 15   Find influenced user
 def fetch_influenced_user(collection):
     output = collection.find({"fans": {"$gte": 1400}}, {"_id": 0, "friends": 0}).limit(5)
     for doc in output:
-        print(doc)
-
-def getLocation():
-    value = input("Please enter your postal code: ")
-    return { "postal_code": value }
+        printDoc(doc)
 
 def printDoc(doc):
     print("{")
