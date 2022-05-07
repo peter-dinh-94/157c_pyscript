@@ -128,7 +128,7 @@ def fetch_popular_business(collection, postal_code):
     query={"is_open" : 1}
     projection={"name": 1, "_id": 0, "review_count" : 1}
     sort_query= {"review_count" : -1}
-    cursor = collection.find({ "$and":[shard_query, query]}, projection).sort(review_count, -1).limit(5)
+    cursor = collection.find({ "$and":[shard_query, query]}, projection).sort("review_count", -1).limit(5)
     for record in cursor:
         printDoc(record)
         
