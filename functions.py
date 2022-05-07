@@ -96,7 +96,7 @@ def find_nearby_businesses_by_loc(collection, postal_code):
     location_query = { "location": { "$geoWithin": { "$centerSphere": [[float(info[0]), float(info[1])], radius] } } }
     
     cursor = collection.find({ "$and":[shard_query, location_query]},
-                            {"name": 1, "address": 1, "postal_code": 1, "city": 1, "location": 1} ).limit(5)
+                            {"name": 1, "address": 1, "postal_code": 1, "city": 1, "location": 1, "_id": 0} ).limit(5)
     for record in cursor:
         printDoc(record)
 
