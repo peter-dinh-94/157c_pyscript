@@ -77,9 +77,9 @@ def find_business_by_name(collection, postal_code):
     name = input("Please Enter Business Name: ")
     output = collection.find({ "$and": [shard_query, {"name": {"$regex": name} } ] },
                              {"name": 1, "address": 1, "city": 1, "state": 1, "postal_code": 1,
-                              "stars": 1, "review_count": 1, "_id": 0}).limit(5)
+                              "stars": 1, "_id": 0}).limit(5)
     for doc in output:
-        print(doc)
+        printDoc(doc)
 
 
 # function 2
@@ -93,7 +93,7 @@ def find_nearby_businesses_by_loc(collection, postal_code):
     cursor = collection.find({ "$and":[shard_query, location_query]},
                             {"name": 1, "address": 1, "postal_code": 1, "city": 1, "location": 1} ).limit(5)
     for record in cursor:
-        print(record)
+        printDoc(record)
 
 
 # function 3
@@ -108,9 +108,9 @@ def find_businesses_by_category(collection, postal_code):
         
     output = collection.find( { "$and": regexQueries } ,
            {"name": 1, "address": 1, "city": 1, "state": 1, "postal_code": 1,
-                              "stars": 1, "review_count": 1}).limit(5)
+                              "stars": 1, "categories": 1, "_id":0 }).limit(5)
     for doc in output:
-        print(doc)
+        printDoc(doc)
 
 # function 4
 def fetch_high_rated_business(collection, postal_code):
@@ -119,7 +119,7 @@ def fetch_high_rated_business(collection, postal_code):
     projection = {"name": 1, "_id": 0, "stars": 1}
     cursor = collection.find( { "$and":[shard_query, query]}, projection).limit(5)
     for record in cursor:
-        print(record)
+        printDoc(record)
 
 
 # function 5
@@ -130,7 +130,7 @@ def fetch_popular_business(collection, postal_code):
     sort_query= {"review_count" : -1}
     cursor = collection.find({ "$and":[shard_query, query]}, projection).sort(review_count, -1).limit(5)
     for record in cursor:
-        print(record)
+        printDoc(record)
         
 # function 6 find businesses that allow pets
 def fetch_business_allowing_pets(collection, postal_code):
@@ -139,7 +139,7 @@ def fetch_business_allowing_pets(collection, postal_code):
     projection = {"name" : 1, "_id" : 0, "city" : 1, "postal_code" : 1, "attributes.DogsAllowed" : 1}
     cursor = collection.find( { "$and": [shard_query, query]}, projection).sort("review_count", -1).limit(5)
     for record in cursor:
-        print(record)
+        printDoc(record)
 
 # function 7 Find restaurants that do not require reservations
 def fetch_restaurants_without_reservations(collection, postal_code):
@@ -148,7 +148,7 @@ def fetch_restaurants_without_reservations(collection, postal_code):
     projection={"name" : 1, "_id" : 0, "city" : 1, "postal_code" : 1, "attributes.RestaurantsReservations": 1}
     cursor = collection.find({ "$and": [shard_query, query]}, projection).sort("review_count", -1).limit(5)
     for record in cursor:
-        print(record)
+        printDoc(record)
 
 # function 8 Find businesses that are wheelchair accessible
 def fetch_wheelchair_accesible_businesses(collection, postal_code):
@@ -157,7 +157,7 @@ def fetch_wheelchair_accesible_businesses(collection, postal_code):
     projection={"name" : 1, "_id" : 0, "city" : 1, "postal_code" : 1, "attributes.WheelchairAccessible": 1}
     cursor = collection.find( { "$and": [shard_query, query]}, projection).sort("review_count", -1).limit(5)
     for record in cursor:
-        print(record)
+        printDoc(record)
 
 # function 9 Find restaurants that are good for kids          
 def fetch_goodforkids_restaurants(collection, postal_code):
@@ -166,7 +166,7 @@ def fetch_goodforkids_restaurants(collection, postal_code):
     projection={"name" : 1, "_id" : 0, "city" : 1, "postal_code" : 1, "attributes.GoodForKids": 1}
     cursor = collection.find(query, projection).sort("review_count", -1).limit(5)
     for record in cursor:
-        print(record)
+        printDoc(record)
 
 # function 10 Find restaurants that have outdoor seating
 def fetch_outdoor_seating_restaurants(collection, postal_code):
@@ -175,7 +175,7 @@ def fetch_outdoor_seating_restaurants(collection, postal_code):
     projection={"name" : 1, "_id" : 0, "city" : 1, "postal_code" : 1, "attributes.GoodForKids": 1}
     cursor = collection.find(query, projection).sort("review_count", -1).limit(5)
     for record in cursor:
-        print(record)
+        printDoc(record)
 
 # function 11 Find businesses that are good for groups 
 def fetch_good_for_groups(collection, postal_code):
@@ -184,7 +184,7 @@ def fetch_good_for_groups(collection, postal_code):
     projection={"name" : 1, "_id" : 0, "city" : 1, "postal_code" : 1, "attributes.GoodForKids": 1}
     cursor = collection.find(query, projection).sort("review_count", -1).limit(5)
     for record in cursor:
-        print(record)
+        printDoc(record)
 
 # function 12 Find users join on a specific date
 def fetch_user_on_date(collection):
@@ -192,7 +192,7 @@ def fetch_user_on_date(collection):
     output = collection.find({"yelping_since": {"$regex": date}},
                              {"_id": 0, "friends": 0}).limit(5)
     for doc in output:
-        print(doc)
+        printDoc(doc)
 
 
 # function 13 Find user by user name
@@ -221,6 +221,11 @@ def getLocation():
     value = input("Please enter your postal code: ")
     return { "postal_code": value }
 
-if __name__=="__main__":
-    main()
+def printDoc(doc):
+    print("{")
+    for key in doc:
+        print("    " + key + ": " + str(doc[key]))
+    print("}")
     
+if __name__== "__main__":
+    main()
