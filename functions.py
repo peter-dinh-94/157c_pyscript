@@ -9,7 +9,9 @@ menu_option = {1: 'Find Business by Name', 2: 'Find Nearby Businesses By Locatio
                13: 'Find user by name', 14: 'Find elite users in a specific year',
                15: 'Find influenced user', 16: 'Exit', 0: 'Select another postal code'}
 
-
+user_projection = {"_id": 0, "friends": 0, "compliment_hot": 0, "compliment_more": 0, "compliment_profile": 0,
+                    "compliment_cute": 0, "compliment_list": 0, "compliment_note": 0, "compliment_plain": 0,
+                    "compliment_cool": 0, "compliment_funny": 0, "compliment_writer": 0, "compliment_photos": 0} 
 def print_menu(menu_option):
     print("\n-----------Welcome to our Yelp Cloning Application--------------")
     for key, value in menu_option.items():
@@ -122,8 +124,6 @@ def find_businesses_by_category(collection, postal_code):
         printDoc(doc)
 
 # function 4
-
-
 def fetch_high_rated_business(collection, postal_code):
     shard_query = {"postal_code": postal_code}
     query = {"stars": {"$gte": 4}}
@@ -146,8 +146,6 @@ def fetch_popular_business(collection, postal_code):
         printDoc(record)
 
 # function 6 find businesses that allow pets
-
-
 def fetch_business_allowing_pets(collection, postal_code):
     shard_query = {"postal_code": postal_code}
     query = {"attributes.DogsAllowed": "true"}
@@ -159,8 +157,6 @@ def fetch_business_allowing_pets(collection, postal_code):
         printDoc(record)
 
 # function 7 Find restaurants that do not require reservations
-
-
 def fetch_restaurants_without_reservations(collection, postal_code):
     shard_query = {"postal_code": postal_code}
     query = {"attributes.RestaurantsReservations": "False"}
@@ -172,8 +168,6 @@ def fetch_restaurants_without_reservations(collection, postal_code):
         printDoc(record)
 
 # function 8 Find businesses that are wheelchair accessible
-
-
 def fetch_wheelchair_accesible_businesses(collection, postal_code):
     shard_query = {"postal_code": postal_code}
     query = {"attributes.WheelchairAccessible": "True"}
@@ -185,8 +179,6 @@ def fetch_wheelchair_accesible_businesses(collection, postal_code):
         printDoc(record)
 
 # function 9 Find restaurants that are good for kids
-
-
 def fetch_goodforkids_restaurants(collection, postal_code):
     shard_query = {"postal_code": postal_code}
     query = {"attributes.GoodForKids": "True"}
@@ -198,8 +190,6 @@ def fetch_goodforkids_restaurants(collection, postal_code):
         printDoc(record)
 
 # function 10 Find restaurants that have outdoor seating
-
-
 def fetch_outdoor_seating_restaurants(collection, postal_code):
     shard_query = {"postal_code": postal_code}
     query = {"attributes.OutdoorSeating": "True"}
@@ -211,8 +201,6 @@ def fetch_outdoor_seating_restaurants(collection, postal_code):
         printDoc(record)
 
 # function 11 Find businesses that are good for groups
-
-
 def fetch_good_for_groups(collection, postal_code):
     shard_query = {"postal_code": postal_code}
     query = {"attributes.RestaurantsGoodForGroups": "True"}
@@ -224,15 +212,14 @@ def fetch_good_for_groups(collection, postal_code):
         printDoc(record)
 
 # function 12 Find users join on a specific date
-
-
 def fetch_user_on_date(collection):
     date = input("Please enter a date in format YYYY-MM-DD: ")
-    output = collection.find({"yelping_since": {"$regex": date}},
-                             {"_id": 0, "friends": 0}).limit(5)
+    year = int(date[0:4])
+    output = collection.find({"$and": [{"joining_year": year},
+        {"yelping_since": {"$regex": date}}]},
+                             user_projection).limit(5)
     for doc in output:
         printDoc(doc)
-
 
 # function 13 Find user by user name
 def fetch_user_by_name(collection):
@@ -243,8 +230,6 @@ def fetch_user_by_name(collection):
         printDoc(doc)
 
 # function 14  Find elite user
-
-
 def fetch_elite_user(collection):
     year = input("Please enter a year: ")
     output = collection.find({"elite": year},
@@ -253,8 +238,6 @@ def fetch_elite_user(collection):
         printDoc(doc)
 
 # function 15   Find influenced user
-
-
 def fetch_influenced_user(collection):
     output = collection.find({"fans": {"$gte": 1400}}, {
                              "_id": 0, "friends": 0}).limit(5)
